@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/register', methods=['POST'])
 def register():
-    request_data = request.get_json(force=True)
+    request_data = _make_request_data(request)
     result = UrlRegister(request_data).execute()
 
     return result
@@ -16,18 +16,38 @@ def register():
 
 @app.route('/<int:url_number>', methods=['GET'])
 def access(url_number):
-    request_args = dict(request.args)
-    result = UrlAccess(request_args, url_number).execute()
+    request_data = _make_request_data(request)
+    result = UrlAccess(request_data, url_number).execute()
 
     return result
 
 
 @app.route('/<int:url_number>/stats', methods=['GET'])
 def stats(url_number):
-    request_args = dict(request.args)
-    result = UrlStats(request_args, url_number).execute()
+    request_data = _make_request_data(request)
+    result = UrlStats(request_data, url_number).execute()
 
     return result
 
+
+@app.errorhandler(404)
+def page_not_found(error):
+
+    return '404 Page Not Found', 404
+
+
+def _make_request_data(request):
+
+    if request.method == 'GET':
+        request_data = dict(request.args)
+        request_data['method'] = request.method
+
+    else:
+        request_data = request.get_json(force=True)
+        request_data['method'] = request.method
+
+    return request_data
+
+
 if __name__ == '__main__':
-    app.run(threaded=True, debug=True)
+    app.run(port=3000, threaded=True, debug=True)
