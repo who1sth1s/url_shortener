@@ -1,4 +1,6 @@
-from flask import Flask, request
+import ujson
+
+from flask import Flask, request, redirect, Response
 from service.url.urlRegister import UrlRegister
 from service.url.urlAccess import UrlAccess
 from service.url.urlStats import UrlStats
@@ -9,9 +11,12 @@ app = Flask(__name__)
 @app.route('/register', methods=['POST'])
 def register():
     request_data = _make_request_data(request)
-    result = UrlRegister(request_data).execute()
+    result, status_code = UrlRegister(request_data).execute()
 
-    return result
+    if result.get('error') is not None:
+        status_code = 400
+
+    return Response(response=ujson.dumps(result), status=status_code, mimetype='application/json')
 
 
 @app.route('/<int:url_number>', methods=['GET'])
