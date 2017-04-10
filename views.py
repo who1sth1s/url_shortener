@@ -24,15 +24,22 @@ def access(url_number):
     request_data = _make_request_data(request)
     result = UrlAccess(request_data, url_number).execute()
 
-    return result
+    if result.get('error') is not None:
+
+        return Response(response=ujson.dumps(result), status=400, mimetype='application/json')
+
+    return redirect(result.get('registered_url')), 301
 
 
 @app.route('/<int:url_number>/stats', methods=['GET'])
 def stats(url_number):
     request_data = _make_request_data(request)
-    result = UrlStats(request_data, url_number).execute()
+    result, status_code = UrlStats(request_data, url_number).execute()
 
-    return result
+    if result.get('error') is not None:
+        status_code = 400
+
+    return Response(response=ujson.dumps(result), status=status_code, mimetype='application/json')
 
 
 @app.errorhandler(404)
