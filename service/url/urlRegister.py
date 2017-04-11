@@ -15,9 +15,9 @@ class UrlRegister:
         return result
 
     def post(self):
-        register_url = self.request.get('url')
+        url = self.request.get('url')
 
-        if register_url is None:
+        if url is None:
 
             return {
                 'error': {
@@ -26,11 +26,11 @@ class UrlRegister:
             }
 
         # 0 is visit count
-        registered_url = self._get_duplicate_registered_url(register_url)
+        registered_url = self._get_duplicate_registered_url(url)
         status_code = 200
 
         if registered_url is None:
-            create_data = [register_url, 0]
+            create_data = [url, 0]
             table_information = ContractionUrl(*create_data)
 
             db_session.add(table_information)
