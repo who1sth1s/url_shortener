@@ -1,5 +1,3 @@
-import ujson
-
 from database.databaseSetting import db_session
 from database.models import ContractionUrl
 
